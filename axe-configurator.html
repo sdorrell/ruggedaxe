@@ -113,19 +113,57 @@ document.addEventListener('input', (e) => {
     .grid.grid-cols-8 { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
     .grid.grid-cols-4 { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
     .grid.grid-cols-3 { grid-template-columns: 1fr !important; gap: 12px !important; }
+    .grid.grid-cols-2 { grid-template-columns: 1fr !important; }
+
+    /* price pill — shrink and push into top-right corner so it never overlaps the axe */
+    .price-pill-wrap { top: 6px !important; right: 6px !important; gap: 4px !important; }
+    .price-pill-wrap > .panel { padding: 2px 8px !important; display:flex; align-items:center; gap:6px; }
+    .price-pill-wrap > .panel > .text-\[9px\] { font-size: 7px !important; letter-spacing:.15em !important; }
+    #priceTotal { font-size: 0.8rem !important; line-height: 1 !important; }
+    .price-pill-wrap #btnReset { padding: 2px 6px !important; font-size: 9px !important; }
+    /* push the THE AXE / MOUNT view tabs below the price pill so they don't collide */
+    section[class*="stage-bg"] > .absolute.top-4.left-1\/2 { top: 34px !important; }
 
     .panel.px-4.py-2 { padding: 4px 8px !important; }
-    #priceTotal { font-size: 1rem !important; }
 
     /* bottom-drawer tabs scroll horizontally */
     section.bg-black\/90 .max-w-\[1700px\] { padding: 0 12px !important; }
     section.bg-black\/90 .flex.items-end { overflow-x: auto; flex-wrap: nowrap; }
+
+    /* uniform chip heights — square-ish options */
+    .piece-opt { min-height: 92px; display:flex !important; flex-direction:column !important; justify-content:center !important; }
+    #sealOptions button { min-height: 78px; }
+    #handleSwatches > * { flex: 0 0 auto; }
+
+    /* Memorabilia (IV): stack category row above grid on mobile */
+    [data-panel="library"] .flex.gap-4 { flex-direction: column !important; height: auto !important; gap: 10px !important; }
+    [data-panel="library"] .w-32 { width: 100% !important; }
+    [data-panel="library"] .w-32 .flex.flex-col,
+    [data-panel="library"] .flex.flex-col.gap-1.w-32 { flex-direction: row !important; flex-wrap: wrap; gap: 6px !important; }
+    [data-panel="library"] .libcat { flex: 1 1 auto; text-align: center !important; padding: 6px 10px !important; }
+    #libraryGrid { grid-template-columns: repeat(4, minmax(0,1fr)) !important; }
+
+    /* Engraving (V): single column, tidy spacing */
+    [data-panel="engraving"] .grid { display:block !important; }
+    [data-panel="engraving"] .grid > div { margin-bottom: 14px; }
+    [data-panel="engraving"] textarea { min-height: 120px; }
+
+    /* Add-Ons (VII): full-width rows */
+    [data-panel="addons"] label.chip { padding: 10px 12px !important; }
+
+    /* Give the drawer more room on mobile */
+    section.bg-black\/90 .panel.border-t-0 { height: 280px !important; }
   }
 
   @media (max-width: 640px) {
     header .btn-gold { display:none; }
-    section[class*="stage-bg"] { height: 52vh !important; }
+    section[class*="stage-bg"] { height: 48vh !important; }
     .corner-orn { display:none; }
+    /* drop memorabilia caption from stage on small phones to free vertical space */
+    section[class*="stage-bg"] > .absolute.bottom-3 { display:none; }
+    .piece-opt .font-display.text-xl { font-size: 1rem !important; }
+    .piece-opt { min-height: 84px; }
+    #libraryGrid { grid-template-columns: repeat(3, minmax(0,1fr)) !important; }
   }
 </style>
 </head>
@@ -160,7 +198,7 @@ document.addEventListener('input', (e) => {
     <button id="viewMount" class="tab-pill tab-pill-active">✦ MOUNT &amp; PLAQUE ✦</button>
   </div>
 
-  <div class="absolute top-4 right-6 flex items-center gap-3 z-20">
+  <div class="price-pill-wrap absolute top-4 right-6 flex items-center gap-3 z-20">
     <div class="panel px-4 py-2 rounded">
       <div class="text-[9px] tracking-[.3em] text-yellow-700/70">TOTAL</div>
       <div id="priceTotal" class="font-display text-xl gold-text">$840</div>
