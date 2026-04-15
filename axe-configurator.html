@@ -329,7 +329,7 @@ const SEALS = [
 
 const state = {
   piece:'mount', view:'mount',
-  handle:'firered', seal:'miami',
+  handle:'firered', seal:'none',
   activeTab:'piece', libCat:'patches',
   placed:[], selectedPlaced:null,
   // image intrinsic dimensions for the axe-base.png (straight handle, cropped transparent)
@@ -598,12 +598,18 @@ function buildHandleSwatches() {
 function buildSeals() {
   const box = document.getElementById('sealOptions');
   box.innerHTML = SEALS.map(s => `
-    <button data-val="${s.id}" class="chip ${state.seal===s.id?'chip-active':''} rounded py-2 px-1 flex flex-col items-center gap-1">
-      <div style="width:40px; height:40px;">${s.id === 'none' ? `<div class="w-full h-full flex items-center justify-center text-yellow-700/60 text-2xl">∅</div>` : sealMarkup(s.id)}</div>
-      <div class="text-[10px] font-display">${s.name}</div>
+    <button data-val="${s.id}" ${s.id !== 'none' ? 'draggable="true"' : ''} class="chip ${state.seal===s.id?'chip-active':''} rounded py-2 px-1 flex flex-col items-center gap-1" title="${s.id !== 'none' ? 'Click to set as blade seal, or drag onto plaque' : 'Remove seal from blade'}">
+      <div style="width:40px; height:40px; pointer-events:none;">${s.id === 'none' ? `<div class="w-full h-full flex items-center justify-center text-yellow-700/60 text-2xl">∅</div>` : sealMarkup(s.id)}</div>
+      <div class="text-[10px] font-display" style="pointer-events:none;">${s.name}</div>
     </button>`).join('');
   box.querySelectorAll('button').forEach(b => {
     b.addEventListener('click', () => { state.seal = b.dataset.val; buildSeals(); render(); });
+    if (b.dataset.val !== 'none') {
+      b.addEventListener('dragstart', e => {
+        e.dataTransfer.setData('text/plain', 'seal:' + b.dataset.val);
+        e.dataTransfer.effectAllowed = 'copy';
+      });
+    }
   });
 }
 
@@ -712,9 +718,16 @@ function attachDragTarget() {
 
 function placeItem(id, x, y) {
   const [cat, itemId] = id.split(':');
-  const def = (LIBRARY[cat]||[]).find(i=>i.id===itemId);
-  if (!def) return;
-  state.placed.push({ uid:'p'+Date.now()+Math.random().toString(36).slice(2,5), cat, itemId, x:x-40, y:y-40, w:80, h:80, rot:0, svg:def.svg() });
+  let svg;
+  if (cat === 'seal') {
+    svg = sealMarkup(itemId);
+    if (!svg) return;
+  } else {
+    const def = (LIBRARY[cat]||[]).find(i=>i.id===itemId);
+    if (!def) return;
+    svg = def.svg();
+  }
+  state.placed.push({ uid:'p'+Date.now()+Math.random().toString(36).slice(2,5), cat, itemId, x:x-40, y:y-40, w:80, h:80, rot:0, svg });
   buildPlacedOverlays();
 }
 
